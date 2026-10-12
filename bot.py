@@ -278,5 +278,5 @@ if __name__ == "__main__":
     app.add_handler(CallbackQueryHandler(select_playstyle, pattern="^m_"))
     app.add_handler(CallbackQueryHandler(show_result, pattern="^res_"))
     
-    print("All Devices Bot live...")
+    print("All Devices Bot live...
     app.run_polling()

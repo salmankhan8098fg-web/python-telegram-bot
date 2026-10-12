@@ -1,13 +1,13 @@
 from keep_alive import keep_alive
 keep_alive()
 
+import os
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
-# Apna BotFather ka token yahan paste karein
-TOKEN = "8710865748:AAGyaCVN5kN8e83lQg2_m0xMb05JDaP7-rY"
+# Render environment variable se token lega, ya fir quotes ke andar daal sakte hain
+TOKEN = os.getenv("BOT_TOKEN", "8710865748:AAGyaCVN5kN8e83lQg2_m0xMb05JDaP7-rY")
 
-# All Brands, Models aur Playstyle ka Data
 SENSITIVITY_DATABASE = {
     "apple": {
         "name": "🍎 Apple (iPhone)",
@@ -173,16 +173,14 @@ SENSITIVITY_DATABASE = {
     }
 }
 
-# Step 1: All Brands Menu
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = []
     brand_keys = list(SENSITIVITY_DATABASE.keys())
     
-    # 2 buttons per row
     for i in range(0, len(brand_keys), 2):
-        row = [InlineKeyboardButton(SENSITIVITY_DATABASE[brand_keys[i]]["name"], callback_query_data=f"b_{brand_keys[i]}")]
+        row = [InlineKeyboardButton(SENSITIVITY_DATABASE[brand_keys[i]]["name"], callback_data=f"b_{brand_keys[i]}")]
         if i + 1 < len(brand_keys):
-            row.append(InlineKeyboardButton(SENSITIVITY_DATABASE[brand_keys[i+1]]["name"], callback_query_data=f"b_{brand_keys[i+1]}"))
+            row.append(InlineKeyboardButton(SENSITIVITY_DATABASE[brand_keys[i+1]]["name"], callback_data=f"b_{brand_keys[i+1]}"))
         keyboard.append(row)
         
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -193,7 +191,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.callback_query.message.edit_text(text, reply_markup=reply_markup, parse_mode="Markdown")
 
-# Step 2: Selected Brand ke All Models
 async def show_models(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -203,9 +200,9 @@ async def show_models(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     keyboard = []
     for model_key, model_info in brand_data["models"].items():
-        keyboard.append([InlineKeyboardButton(model_info["name"], callback_query_data=f"m_{brand_key}_{model_key}")])
+        keyboard.append([InlineKeyboardButton(model_info["name"], callback_data=f"m_{brand_key}_{model_key}")])
         
-    keyboard.append([InlineKeyboardButton("🔙 Brands Menu", callback_query_data="back_home")])
+    keyboard.append([InlineKeyboardButton("🔙 Brands Menu", callback_data="back_home")])
     reply_markup = InlineKeyboardMarkup(keyboard)
     
     await query.edit_message_text(
@@ -214,7 +211,6 @@ async def show_models(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown"
     )
 
-# Step 3: Playstyle (Gyro vs Non-Gyro)
 async def select_playstyle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -224,10 +220,10 @@ async def select_playstyle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     keyboard = [
         [
-            InlineKeyboardButton("🎯 Full Gyroscope", callback_query_data=f"res_{brand_key}_{model_key}_gyro"),
-            InlineKeyboardButton("👆 Non-Gyro (Thumb)", callback_query_data=f"res_{brand_key}_{model_key}_nongyro")
+            InlineKeyboardButton("🎯 Full Gyroscope", callback_data=f"res_{brand_key}_{model_key}_gyro"),
+            InlineKeyboardButton("👆 Non-Gyro (Thumb)", callback_data=f"res_{brand_key}_{model_key}_nongyro")
         ],
-        [InlineKeyboardButton("🔙 Change Model", callback_query_data=f"b_{brand_key}")]
+        [InlineKeyboardButton("🔙 Change Model", callback_data=f"b_{brand_key}")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
@@ -237,7 +233,6 @@ async def select_playstyle(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode="Markdown"
     )
 
-# Step 4: Final Result (Code + Details)
 async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -248,8 +243,8 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
     style_label = "Full Gyroscope" if playstyle == "gyro" else "Non-Gyro (Thumb)"
     
     keyboard = [
-        [InlineKeyboardButton("🔙 Change Playstyle", callback_query_data=f"m_{brand_key}_{model_key}")],
-        [InlineKeyboardButton("🏠 Main Menu", callback_query_data="back_home")]
+        [InlineKeyboardButton("🔙 Change Playstyle", callback_data=f"m_{brand_key}_{model_key}")],
+        [InlineKeyboardButton("🏠 Main Menu", callback_data="back_home")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
@@ -263,7 +258,6 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await query.edit_message_text(response, reply_markup=reply_markup, parse_mode="Markdown")
 
-# Back to Start Handler
 async def back_to_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()

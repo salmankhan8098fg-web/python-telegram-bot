@@ -5,7 +5,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
 # Apna BotFather ka token yahan paste karein
-TOKEN = "8710865748:AAFZ130S4fNIMFmtqMeQ7NIx2nFCgYuIgqI"
+TOKEN = "8710865748:AAFFRSDzwsQmQTkZy8t7_vw0aEmF7X7J4GY"
 
 # All Brands, Models aur Playstyle ka Data
 SENSITIVITY_DATABASE = {
